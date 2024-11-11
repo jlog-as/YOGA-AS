@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import backend from '@tensorflow/tfjs-backend-webgl'
 import Webcam from 'react-webcam'
 import { count } from '../../utils/music'; 
-import axios from 'axios';
+ 
 import Instructions from '../../components/Instrctions/Instructions';
 
 import './Yoga.css'
@@ -14,7 +14,7 @@ import { poseImages } from '../../utils/pose_images';
 import { POINTS, keypointConnections } from '../../utils/data';
 import { drawPoint, drawSegment } from '../../utils/helper'
 
-console.log('running');
+
 
 let skeletonColor = 'rgb(255,255,255)'
 let poseList = [
@@ -40,49 +40,8 @@ function Yoga() {
   const [bestPerform, setBestPerform] = useState(0)
   const [currentPose, setCurrentPose] = useState('Tree')
   const [isStartPose, setIsStartPose] = useState(false)
-  const [bestTime, setBestTime] = useState(0);  // State to store the best time from the backend
 
-
-   // Fetch the best time for the current pose when it changes
-   useEffect(() => {
-    const fetchBestTime = async () => {
-      try {
-        // Send a GET request to fetch the best time for the current pose
-        const response = await axios.get(`http://localhost:5000/api/best-time/${currentPose}`);
-        setBestTime(response.data.bestTime || 0);  // Update the state with the best time
-      } catch (error) {
-        console.error('Error fetching best time:', error);
-      }
-    };
-
-    fetchBestTime();  // Fetch the best time whenever `currentPose` changes
-  }, [currentPose]); // Dependency array: Re-run the effect whenever `currentPose` changes
-
-
-
-   // Add useEffect to update the bestPerform in DB when it changes
-   useEffect(() => {
-    if (bestPerform > 0) {
-      // Print best performance to the console every time it changes
-      console.log(`Best performance for ${currentPose}: ${bestPerform.toFixed(2)} seconds`);
-      
-      // Call the API to update the best time in the database
-      sendBestTimeToDB(currentPose, bestPerform.toFixed(2));
-    }
-  }, [bestPerform]);  // This hook runs whenever bestPerform changes
-
-  const sendBestTimeToDB = async (name, bestTime) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/update-best-time', {
-        name,
-        bestTime,
-      });
-      console.log('Best time updated in the database:', response.data);
-    } catch (error) {
-      console.error('Error updating best time:',error.response || error);
-    }
-  };
-
+  
   useEffect(() => {
     const timeDiff = (currentTime - startingTime)/1000
     if(flag) {
@@ -235,6 +194,7 @@ function Yoga() {
         console.log(err)
       }
       
+      
     }
   }
 
@@ -248,6 +208,8 @@ function Yoga() {
     clearInterval(interval)
   }
 
+    
+
   if(isStartPose) {
     return (
       <div className="yoga-container">
@@ -256,7 +218,7 @@ function Yoga() {
               <h4>Pose Time: {poseTime} s</h4>
             </div>
             <div className="pose-performance">
-              <h4>Best: {bestTime} s</h4>
+              <h4>Best: {bestPerform} s</h4>
             </div>
           </div>
         <div>
